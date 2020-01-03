@@ -1,6 +1,7 @@
 package gojsonschema
 
 import (
+	"errors"
 	"net"
 	"net/mail"
 	"net/url"
@@ -15,6 +16,14 @@ type (
 	FormatChecker interface {
 		// IsFormat checks if input has the correct format and type
 		IsFormat(input interface{}) bool
+	}
+
+	// FormatErrorChecker is augmented version of FormatChecker, allowing a detailed error to
+	// be returned
+	FormatErrorChecker interface {
+		FormatChecker
+		// ValidateFormat checks if input has the correct format and type
+		ValidateFormat(input interface{}) error
 	}
 
 	// FormatCheckerChain holds the formatters
@@ -142,6 +151,8 @@ var (
 	rxRelJSONPointer = regexp.MustCompile("^(?:0|[1-9][0-9]*)(?:#|(?:/(?:[^~/]|~0|~1)*)*)$")
 
 	lock = new(sync.RWMutex)
+
+	ErrInvalidFormat = errors.New("invalid input format")
 )
 
 // Add adds a FormatChecker to the FormatCheckerChain
@@ -172,19 +183,27 @@ func (c *FormatCheckerChain) Has(name string) bool {
 	return ok
 }
 
-// IsFormat will check an input against a FormatChecker with the given name
+// ValidateFormat will check an input against a FormatChecker with the given name
 // to see if it is the correct format
-func (c *FormatCheckerChain) IsFormat(name string, input interface{}) bool {
+func (c *FormatCheckerChain) ValidateFormat(name string, input interface{}) error {
 	lock.RLock()
 	f, ok := c.formatters[name]
 	lock.RUnlock()
 
 	// If a format is unrecognized it should always pass validation
 	if !ok {
-		return true
+		return nil
 	}
 
-	return f.IsFormat(input)
+	if ef, ok := f.(FormatErrorChecker); ok {
+		return ef.ValidateFormat(input)
+	}
+
+	if !f.IsFormat(input) {
+		return ErrInvalidFormat
+	}
+
+	return nil
 }
 
 // IsFormat checks if input is a correctly formatted e-mail address

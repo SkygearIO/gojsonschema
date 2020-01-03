@@ -288,7 +288,11 @@ func newError(err ResultError, context *JsonContext, value interface{}, locale l
 		d = locale.DoesNotMatchPattern()
 	case *DoesNotMatchFormatError:
 		t = "format"
-		d = locale.DoesNotMatchFormat()
+		if details["error"] != nil && details["error"] != ErrInvalidFormat {
+			d = locale.DoesNotMatchFormatWithError()
+		} else {
+			d = locale.DoesNotMatchFormat()
+		}
 	case *MultipleOfError:
 		t = "multiple_of"
 		d = locale.MultipleOf()
