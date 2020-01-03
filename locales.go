@@ -107,6 +107,9 @@ type (
 		// DoesNotMatchFormat returns a format-string to format an DoesNotMatchFormatError
 		DoesNotMatchFormat() string
 
+		// DoesNotMatchFormatWithError returns a format-string to format an DoesNotMatchFormatError with error message included
+		DoesNotMatchFormatWithError() string
+
 		// MultipleOf returns a format-string to format an MultipleOfError
 		MultipleOf() string
 
@@ -320,6 +323,11 @@ func (l DefaultLocale) DoesNotMatchPattern() string {
 // DoesNotMatchFormat returns a format-string to format an DoesNotMatchFormatError
 func (l DefaultLocale) DoesNotMatchFormat() string {
 	return `Does not match format '{{.format}}'`
+}
+
+// DoesNotMatchFormatWithError returns a format-string to format an DoesNotMatchFormatError with error message included
+func (l DefaultLocale) DoesNotMatchFormatWithError() string {
+	return `Does not match format '{{.format}}': {{.error}}`
 }
 
 // MultipleOf returns a format-string to format an MultipleOfError

@@ -2,8 +2,10 @@ package gojsonschema
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
+	"errors"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUUIDFormatCheckerIsFormat(t *testing.T) {
@@ -85,11 +87,18 @@ func (c objectChecker) IsFormat(input interface{}) bool {
 type stringChecker struct{}
 
 func (c stringChecker) IsFormat(input interface{}) bool {
+	return c.ValidateFormat(input) == nil
+}
+
+func (c stringChecker) ValidateFormat(input interface{}) error {
 	str, ok := input.(string)
 	if !ok {
-		return true
+		return errors.New("input must be a string")
 	}
-	return str == "o"
+	if str != "o" {
+		return errors.New("expected 'o'")
+	}
+	return nil
 }
 
 func TestCustomFormat(t *testing.T) {
@@ -129,7 +138,12 @@ func TestCustomFormat(t *testing.T) {
 		t.Error(err)
 	}
 
-	assert.Len(t, invalidResult.Errors(), 5)
+	errors := []string{}
+	for _, err := range invalidResult.Errors() {
+		errors = append(errors, err.String())
+	}
+	assert.Len(t, errors, 5)
+	assert.Contains(t, errors, "str: Does not match format 'StringChecker': expected 'o'")
 
 	FormatCheckers.
 		Remove("ArrayChecker").
