@@ -14,7 +14,7 @@ import (
 type (
 	// FormatChecker is the interface all formatters added to FormatCheckerChain must implement
 	FormatChecker interface {
-		// IsFormat checks if input has the correct format and type
+		// IsFormat checks if input has the correct format
 		IsFormat(input interface{}) bool
 	}
 
@@ -210,7 +210,7 @@ func (c *FormatCheckerChain) ValidateFormat(name string, input interface{}) erro
 func (f EmailFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	_, err := mail.ParseAddress(asString)
@@ -221,7 +221,7 @@ func (f EmailFormatChecker) IsFormat(input interface{}) bool {
 func (f IPV4FormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	// Credit: https://github.com/asaskevich/govalidator
@@ -233,7 +233,7 @@ func (f IPV4FormatChecker) IsFormat(input interface{}) bool {
 func (f IPV6FormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	// Credit: https://github.com/asaskevich/govalidator
@@ -245,7 +245,7 @@ func (f IPV6FormatChecker) IsFormat(input interface{}) bool {
 func (f DateTimeFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	formats := []string{
@@ -269,7 +269,7 @@ func (f DateTimeFormatChecker) IsFormat(input interface{}) bool {
 func (f DateFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 	_, err := time.Parse("2006-01-02", asString)
 	return err == nil
@@ -279,7 +279,7 @@ func (f DateFormatChecker) IsFormat(input interface{}) bool {
 func (f TimeFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	if _, err := time.Parse("15:04:05Z07:00", asString); err == nil {
@@ -294,7 +294,7 @@ func (f TimeFormatChecker) IsFormat(input interface{}) bool {
 func (f URIFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	u, err := url.Parse(asString)
@@ -310,7 +310,7 @@ func (f URIFormatChecker) IsFormat(input interface{}) bool {
 func (f URIReferenceFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	_, err := url.Parse(asString)
@@ -321,7 +321,7 @@ func (f URIReferenceFormatChecker) IsFormat(input interface{}) bool {
 func (f URITemplateFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	u, err := url.Parse(asString)
@@ -336,7 +336,7 @@ func (f URITemplateFormatChecker) IsFormat(input interface{}) bool {
 func (f HostnameFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	return rxHostname.MatchString(asString) && len(asString) < 256
@@ -346,7 +346,7 @@ func (f HostnameFormatChecker) IsFormat(input interface{}) bool {
 func (f UUIDFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	return rxUUID.MatchString(asString)
@@ -356,7 +356,7 @@ func (f UUIDFormatChecker) IsFormat(input interface{}) bool {
 func (f RegexFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	if asString == "" {
@@ -370,7 +370,7 @@ func (f RegexFormatChecker) IsFormat(input interface{}) bool {
 func (f JSONPointerFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	return rxJSONPointer.MatchString(asString)
@@ -380,7 +380,7 @@ func (f JSONPointerFormatChecker) IsFormat(input interface{}) bool {
 func (f RelativeJSONPointerFormatChecker) IsFormat(input interface{}) bool {
 	asString, ok := input.(string)
 	if !ok {
-		return false
+		return true
 	}
 
 	return rxRelJSONPointer.MatchString(asString)
